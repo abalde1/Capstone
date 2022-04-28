@@ -17,7 +17,7 @@ import seaborn as sns
 def main():
 
     #Load data and modify data.
-    car_data = pd.read_csv('data/car data.csv')
+    car_data = pd.read_csv('car data.csv')
     car_data.replace({'Fuel_Type':{'Petrol':0,'Diesel':1,'CNG':2}},inplace=True)
     car_data.replace({'Transmission':{'Manual':0, 'Automatic':1}},inplace=True)
     car_data.replace({'Seller_Type':{'Individual':0, 'Dealer':1}},inplace=True)
