@@ -56,9 +56,9 @@ def main():
             #Split, train, and test model
             X = car_data[["Year","Present_Price","Kms_Driven","Fuel_Type","Seller_Type","Transmission"]]
             y = car_data[["Selling_Price"]]
-            st.write(y)
+            #st.write(y)
             act_value = [[year, present_price, kms, fuel, seller, transmission]]
-            st.write(act_value)
+            #st.write(act_value)
 
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.1, random_state=2)
 
