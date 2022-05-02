@@ -17,7 +17,7 @@ import seaborn as sns
 def main():
 
     #Load data and modify data.
-    car_data = pd.read_csv('car data.csv')
+    car_data = pd.read_csv('data/car data.csv')
     car_data.replace({'Fuel_Type':{'Petrol':0,'Diesel':1,'CNG':2}},inplace=True)
     car_data.replace({'Transmission':{'Manual':0, 'Automatic':1}},inplace=True)
     car_data.replace({'Seller_Type':{'Individual':0, 'Dealer':1}},inplace=True)
@@ -44,28 +44,51 @@ def main():
 
             #Column component and create variables.
             sel_col, disp_col = st.columns(2)
-            age = sel_col.slider('What is the year of your car?', min_value = 2006, max_value = 2022, value = 2010)
-            fuel = sel_col.selectbox('Fuel type?', options = ['Petrol', 'Diesel'])
-            age_reshaped = np.array(age).reshape(-1,1)
+            year = sel_col.slider('What is the year of your car', min_value = 2006, max_value = 2022, value = 2010)
+            present_price = sel_col.slider('Inintial price', min_value = 0.3, max_value = 50.0, value = 10.0, step=0.25)
+            kms = sel_col.slider('Milleage', min_value = 500, max_value = 500000, value = 32000)
+            fuel = sel_col.selectbox('Fuel type (0 for Petrol - 1 for Diesel?', options = [0, 1])
+            seller = sel_col.selectbox('Seller type (0 for - 1 for',  options = [0, 1])
+            transmission = sel_col.selectbox('Transmission?(0 for - 1 for ',  options = [0, 1])
+            
+            age_reshaped = np.array(year).reshape(-1,1)
 
             #Split, train, and test model
-            X = car_data[["Year"]]
+            X = car_data[["Year","Present_Price","Kms_Driven","Fuel_Type","Seller_Type","Transmission"]]
             y = car_data[["Selling_Price"]]
-            act_value = [[age]]
+            st.write(y)
+            act_value = [[year, present_price, kms, fuel, seller, transmission]]
+            st.write(act_value)
 
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state=42)
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.1, random_state=2)
 
             lrgr = LinearRegression()
+            lsrgr =Lasso()
+
             lrgr.fit(X_train, y_train)
+            lsrgr.fit(X_train, y_train)
 
             train_p1 = lrgr.predict(X_train)
-            train_p = lrgr.predict(act_value)
+            lstrain = lsrgr.predict(X_train)
+            lirgrs = lrgr.predict(act_value)
+            #error_score_train=metrics.r2_score(y_train, train_p1)
+            #train_p = lrgr.predict(act_value)
             test_p = lrgr.predict(X_test)
+            
+            #st.write(error_score_train)
+            #ls_error=metrics.r2_score(y_train, lstrain)
+            #st.write(ls_error)
+            #error_score_test=metrics.r2_score(y_test, test_p)
+            #st.write(error_score_test)
 
+            #handle the estimate button
             if sel_col.button("Estimate"):
                 disp_col.subheader('Your car value is: ')
-                c_value=train_p
+                c_value=lirgrs
+                error_score_test=metrics.r2_score(y_test, test_p)
                 disp_col.write(c_value)
+                disp_col.write("Model accuracy")
+                disp_col.write(error_score_test)
             
         #Display the report page        
         elif menu == "Report":
@@ -94,8 +117,6 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
 
 
 
